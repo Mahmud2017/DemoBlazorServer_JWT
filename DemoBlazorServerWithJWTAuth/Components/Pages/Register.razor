@@ -1,0 +1,76 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+
+<PageTitle>Register</PageTitle>
+
+@* <h1>Please Register</h1> *@
+
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <EditForm Model="RegisterData" OnValidSubmit="RegisterUser" FormName="register">
+                <DataAnnotationsValidator />
+                <h2>Create a new account</h2>
+                <hr />
+                <ValidationSummary class="text-danger" role="alert" />
+
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="RegisterData.FirstName" class="form-control" autocomplete="username" aria-required="true" placeholder="first name" />
+                    <label for="firstname" class="form-label">First Name</label>
+                    <ValidationMessage For="() => RegisterData.FirstName" class="text-danger" />
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="RegisterData.LastName" class="form-control" autocomplete="username" aria-required="true" placeholder="last name" />
+                    <label for="lastname" class="form-label">Last Name</label>
+                    <ValidationMessage For="() => RegisterData.LastName" class="text-danger" />
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="RegisterData.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <label for="email" class="form-label">Email</label>
+                    <ValidationMessage For="() => RegisterData.Email" class="text-danger" />
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="RegisterData.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <label for="password" class="form-label">Password</label>
+                    <ValidationMessage For="() => RegisterData.Password" class="text-danger" />
+                </div>
+
+                @* <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="RegisterData.ConfirmPassword" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <label for="confirm-password" class="form-label">Confirm Password</label>
+                    <ValidationMessage For="() => RegisterData.ConfirmPassword" class="text-danger" />
+                </div> *@
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="RegisterData.Role" class="form-control" autocomplete="role" aria-required="true" placeholder="role" />
+                    <label for="role" class="form-label">Role</label>
+                    <ValidationMessage For="() => RegisterData.Role" class="text-danger" />
+                </div>
+
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
+</div>
+
+@code {
+    private RegisterDTO RegisterData { get; set; } = new();
+
+    public async Task RegisterUser()
+    {
+        RegistrationResponse response = await accountService.RegisterAsync(RegisterData);
+
+        if (!response.Flag)
+        {
+            await js.InvokeVoidAsync("alert", response.Message);
+            return;
+        }
+
+        RegisterData = new();
+        NavManager.NavigateTo("/login", forceLoad: true);
+    }
+}
